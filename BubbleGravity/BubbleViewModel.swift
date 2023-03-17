@@ -9,13 +9,19 @@ extension CGPoint {
 struct Bubble: Identifiable {
     let id = UUID()
     var position: CGPoint
+    var size: CGFloat // Add size property
 }
+
+
+
 
 class BubbleViewModel: ObservableObject {
     @Published var bubbles: [Bubble] = []
         
         var buttonDiameter: CGFloat = 60 // Default value, can be updated later
 
+    let maxBubbleSize: CGFloat = 130 // Add maxBubbleSize constant
+    let minBubbleSize: CGFloat = 20 // Add maxBubbleSize constant
     var center: CGPoint = .zero
 
     func setCenter(_ center: CGPoint) {
@@ -29,8 +35,9 @@ class BubbleViewModel: ObservableObject {
         }
 
     func addBubble(at position: CGPoint) {
-        let bubble = Bubble(position: position)
-        bubbles.append(bubble)
+        let size = CGFloat.random(in: minBubbleSize...maxBubbleSize) // Generate random size
+            let bubble = Bubble(position: position, size: size) // Add size here
+            bubbles.append(bubble)
         
         let angle = Double.random(in: 0..<2 * .pi)
         let distance: CGFloat = 100
@@ -44,131 +51,16 @@ class BubbleViewModel: ObservableObject {
         
         animateBubbles(to: center)
     }
-//    it works!!
-//    func applyGravity(to center: CGPoint) {
-//            let movementSpeed: CGFloat = 0.2 // Adjust this value to change the strength of the gravitational pull
-//
-//            for (index, _) in bubbles.enumerated() {
-//                let currentPosition = bubbles[index].position
-//                let direction = CGVector(dx: center.x - currentPosition.x, dy: center.y - currentPosition.y)
-//                let distance = sqrt(pow(direction.dx, 2) + pow(direction.dy, 2))
-//                let normalizedDirection = CGVector(dx: direction.dx / distance, dy: direction.dy / distance)
-//
-//                let newPosition = CGPoint(x: currentPosition.x + normalizedDirection.dx * movementSpeed, y: currentPosition.y + normalizedDirection.dy * movementSpeed)
-//
-//                if !path.contains(newPosition) {
-//                    bubbles[index].position = newPosition
-//                }
-//            }
-//            resolveCollisions()
-//        }
-    
-    
-//    IT WORKS v2
-//    func applyGravity(to center: CGPoint) {
-//            let movementSpeed: CGFloat = 0.3 // Adjust this value to change the strength of the gravitational pull
-//            let buttonPushForce: CGFloat = 0.4 // Adjust this value to change the strength of the push force between bubbles and the + button
-//
-//            for (index, _) in bubbles.enumerated() {
-//                let currentPosition = bubbles[index].position
-//                let direction = CGVector(dx: center.x - currentPosition.x, dy: center.y - currentPosition.y)
-//                let distance = sqrt(pow(direction.dx, 2) + pow(direction.dy, 2))
-//                let normalizedDirection = CGVector(dx: direction.dx / distance, dy: direction.dy / distance)
-//
-//                let newPosition = CGPoint(x: currentPosition.x + normalizedDirection.dx * movementSpeed, y: currentPosition.y + normalizedDirection.dy * movementSpeed)
-//
-//                if !path.contains(newPosition) {
-//                    bubbles[index].position = newPosition
-//                } else {
-//                    // Push bubbles away from the + button
-//                    bubbles[index].position.x -= normalizedDirection.dx * buttonPushForce
-//                    bubbles[index].position.y -= normalizedDirection.dy * buttonPushForce
-//                }
-//            }
-//            resolveCollisions()
-//        }
-//
-//        func resolveCollisions() {
-//            let bubbleRadius: CGFloat = 20
-//            let pushForce: CGFloat = 0.5 // Adjust this value to change the strength of the push force between bubbles
-//
-//            for i in 0..<bubbles.count {
-//                for j in (i + 1)..<bubbles.count {
-//                    let distance = bubbles[i].position.distance(to: bubbles[j].position)
-//
-//                    if distance < 2 * bubbleRadius {
-//                        let direction = CGVector(dx: bubbles[j].position.x - bubbles[i].position.x, dy: bubbles[j].position.y - bubbles[i].position.y)
-//                        let normalizedDirection = CGVector(dx: direction.dx / distance, dy: direction.dy / distance)
-//
-//                        bubbles[i].position.x -= normalizedDirection.dx * pushForce
-//                        bubbles[i].position.y -= normalizedDirection.dy * pushForce
-//                        bubbles[j].position.x += normalizedDirection.dx * pushForce
-//                        bubbles[j].position.y += normalizedDirection.dy * pushForce
-//                    }
-//                }
-//            }
-//        }
 
-//    IT WORKS V3
-//    func applyGravity(to center: CGPoint) {
-//            let movementSpeed: CGFloat = 0.2
-//            let buttonPushForce: CGFloat = 1.7
-//            let bubbleRadius: CGFloat = 20
-//
-//
-//            for (index, _) in bubbles.enumerated() {
-//                let currentPosition = bubbles[index].position
-//                let direction = CGVector(dx: center.x - currentPosition.x, dy: center.y - currentPosition.y)
-//                let distance = sqrt(pow(direction.dx, 2) + pow(direction.dy, 2))
-//                let normalizedDirection = CGVector(dx: direction.dx / distance, dy: direction.dy / distance)
-//
-//                let newPosition = CGPoint(x: currentPosition.x + normalizedDirection.dx * movementSpeed, y: currentPosition.y + normalizedDirection.dy * movementSpeed)
-//
-//                if !path.contains(newPosition) {
-//                    bubbles[index].position = newPosition
-//                } else {
-//                    let pushDistance = max(0, 2 * bubbleRadius - distance) * buttonPushForce
-//                    bubbles[index].position.x -= normalizedDirection.dx * pushDistance
-//                    bubbles[index].position.y -= normalizedDirection.dy * pushDistance
-//                }
-//            }
-//            resolveCollisions()
-//        }
-    
-//    IT Works v4
-//    func applyGravity(to center: CGPoint) {
-//        let bubbleRadius: CGFloat = 20
-//        let movementSpeed: CGFloat = 0.1
-//        let buttonPushForce: CGFloat = 1.0
-//
-//        for (index, _) in bubbles.enumerated() {
-//            let currentPosition = bubbles[index].position
-//            let direction = CGVector(dx: center.x - currentPosition.x, dy: center.y - currentPosition.y)
-//            let distance = sqrt(pow(direction.dx, 2) + pow(direction.dy, 2))
-//            let normalizedDirection = CGVector(dx: direction.dx / distance, dy: direction.dy / distance)
-//
-//            let newPosition = CGPoint(x: currentPosition.x + normalizedDirection.dx * movementSpeed, y: currentPosition.y + normalizedDirection.dy * movementSpeed)
-//
-//            bubbles[index].position = newPosition
-//
-//            if path.contains(newPosition) {
-//                let pushDistance = max(0, 2 * bubbleRadius - distance) * buttonPushForce
-//                bubbles[index].position.x -= normalizedDirection.dx * pushDistance
-//                bubbles[index].position.y -= normalizedDirection.dy * pushDistance
-//            }
-//        }
-//        resolveCollisions()
-//    }
 
     func applyGravity(to center: CGPoint) {
-        let bubbleRadius: CGFloat = 20
         let movementSpeed: CGFloat = 0.5
         let buttonPushForce: CGFloat = 1.0
         let buttonRadius: CGFloat = buttonDiameter / 2
-        
 
-        for (index, _) in bubbles.enumerated() {
-            let currentPosition = bubbles[index].position
+        for (index, bubble) in bubbles.enumerated() {
+            let currentPosition = bubble.position
+            let bubbleRadius = bubble.size / 2 // Use bubble size here
             let direction = CGVector(dx: center.x - currentPosition.x, dy: center.y - currentPosition.y)
             let distance = sqrt(pow(direction.dx, 2) + pow(direction.dy, 2))
             let normalizedDirection = CGVector(dx: direction.dx / distance, dy: direction.dy / distance)
@@ -186,29 +78,37 @@ class BubbleViewModel: ObservableObject {
         resolveCollisions()
     }
 
+    func resolveCollisions() {
+        let minPushForce: CGFloat = 0.7
+        let maxPushForce: CGFloat = 2.0
+        let damping: CGFloat = 0.3
 
-        func resolveCollisions() {
-            let bubbleRadius: CGFloat = 20
-            let pushForce: CGFloat = 0.7
+        for i in 0..<bubbles.count {
+            for j in (i + 1)..<bubbles.count {
+                let distance = bubbles[i].position.distance(to: bubbles[j].position)
+                let bubbleRadius1 = bubbles[i].size / 2
+                let bubbleRadius2 = bubbles[j].size / 2
 
-            for i in 0..<bubbles.count {
-                for j in (i + 1)..<bubbles.count {
-                    let distance = bubbles[i].position.distance(to: bubbles[j].position)
+                if distance < bubbleRadius1 + bubbleRadius2 {
+                    let direction = CGVector(dx: bubbles[j].position.x - bubbles[i].position.x, dy: bubbles[j].position.y - bubbles[i].position.y)
+                    let normalizedDirection = CGVector(dx: direction.dx / distance, dy: direction.dy / distance)
 
-                    if distance < 2 * bubbleRadius {
-                        let direction = CGVector(dx: bubbles[j].position.x - bubbles[i].position.x, dy: bubbles[j].position.y - bubbles[i].position.y)
-                        let normalizedDirection = CGVector(dx: direction.dx / distance, dy: direction.dy / distance)
+                    let pushDistance = max(0, bubbleRadius1 + bubbleRadius2 - distance)
+                    
+                    // Calculate pushForce based on bubble sizes
+                    let sizeFactor = max(bubbles[i].size, bubbles[j].size) / maxBubbleSize
+                    let pushForce = (minPushForce + sizeFactor * (maxPushForce - minPushForce)) * damping
 
-                        let pushDistance = max(0, 2 * bubbleRadius - distance) * pushForce
-
-                        bubbles[i].position.x -= normalizedDirection.dx * pushDistance
-                        bubbles[i].position.y -= normalizedDirection.dy * pushDistance
-                        bubbles[j].position.x += normalizedDirection.dx * pushDistance
-                        bubbles[j].position.y += normalizedDirection.dy * pushDistance
-                    }
+                    bubbles[i].position.x -= normalizedDirection.dx * pushDistance * pushForce
+                    bubbles[i].position.y -= normalizedDirection.dy * pushDistance * pushForce
+                    bubbles[j].position.x += normalizedDirection.dx * pushDistance * pushForce
+                    bubbles[j].position.y += normalizedDirection.dy * pushDistance * pushForce
                 }
             }
         }
+    }
+
+
     func animateBubbles(to center: CGPoint, duration: TimeInterval = 1.0, speed: Double = 1.0) {
         withAnimation(.linear(duration: duration).speed(speed)) {
             for index in bubbles.indices {

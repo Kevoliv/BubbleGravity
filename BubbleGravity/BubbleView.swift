@@ -6,38 +6,16 @@
 //
 import SwiftUI
 
-//struct BubbleView: View {
-//    @Binding var position: CGPoint
-//    var stopPosition: CGPoint
-//
-//    var body: some View {
-//        GeometryReader { geometry in
-//            Circle()
-//                .fill(Color.random)
-//                .frame(width: 40, height: 40)
-//                .position(position)
-//                .onChange(of: geometry.frame(in: .global).origin) { newValue in
-//                    if distance(newValue, stopPosition) <= 60 {
-//                        position = newValue
-//                    }
-//                }
-//        }
-//    }
-//
-//    private func distance(_ point1: CGPoint, _ point2: CGPoint) -> CGFloat {
-//        let xDistance = point1.x - point2.x
-//        let yDistance = point1.y - point2.y
-//        return hypot(xDistance, yDistance)
-//    }
-//}
+
 
 struct BubbleView: View {
     @Binding var position: CGPoint
+    var size: CGFloat // Add size property
 
     var body: some View {
         Circle()
             .fill(Color.red)
-            .frame(width: 40, height: 40)
+            .frame(width: size, height: size) // Use size property here
             .position(position)
     }
 }
