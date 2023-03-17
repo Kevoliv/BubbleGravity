@@ -20,20 +20,7 @@ extension CGRect {
         return CGPoint(x: midX, y: midY)
     }
 }
-//struct PlusButton: View {
-//    var action: () -> Void
-//
-//    var body: some View {
-//        Button(action: action) {
-//            Image(systemName: "plus")
-//                .font(.system(size: 30, weight: .bold))
-//                .foregroundColor(.white)
-//                .frame(width: 60.0, height: 60)
-//                .background(Color.blue)
-//                .cornerRadius(30)
-//        }
-//    }
-//}
+
 
 struct PlusButton: View {
     var action: () -> Void
@@ -59,37 +46,15 @@ struct ContentView: View {
 
     
     let timer = Timer.publish(every: 0.01, on: .main, in: .common).autoconnect()
-//IT WORKS
-//        var body: some View {
-//            GeometryReader { geometry in
-//                ZStack {
-//                    ForEach(viewModel.bubbles.indices, id: \.self) { index in
-//                        BubbleView(position: viewModel.positionBinding(for: index))
-//                    }
-//
-//                    PlusButton {
-//                        let position = geometry.size.center
-//                        viewModel.addBubble(at: position)
-//                    }
-//                    .position(geometry.size.center)
-//                }
-//                .onAppear {
-//                     viewModel.setCenter(geometry.size.center)
-//                    let circle = Circle().path(in: CGRect(x: geometry.size.width / 2 - 65, y: geometry.size.height / 2 - 65, width: 130, height: 130))
-//                    viewModel.setPath(circle)
-//                }
-//                .onReceive(timer) { _ in
-//                    viewModel.applyGravity(to: geometry.size.center)
-//                }
-//            }
-//        }
+
     
     var body: some View {
             GeometryReader { geometry in
-                ZStack {
+                ZStack { 
                     ForEach(viewModel.bubbles.indices, id: \.self) { index in
-                        BubbleView(position: viewModel.positionBinding(for: index))
+                        BubbleView(position: viewModel.positionBinding(for: index), size: viewModel.bubbles[index].size)
                     }
+
 
                     PlusButton(action: {
                         let position = center ?? geometry.size.center
