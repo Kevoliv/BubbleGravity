@@ -165,6 +165,7 @@ class BubbleViewModel: ObservableObject {
         let movementSpeed: CGFloat = 0.5
         let buttonPushForce: CGFloat = 1.0
         let buttonRadius: CGFloat = buttonDiameter / 2
+        
 
         for (index, _) in bubbles.enumerated() {
             let currentPosition = bubbles[index].position
