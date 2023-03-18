@@ -18,11 +18,14 @@ struct Bubble: Identifiable {
 class BubbleViewModel: ObservableObject {
     @Published var bubbles: [Bubble] = []
         
-        var buttonDiameter: CGFloat = 60 // Default value, can be updated later
+        var buttonDiameter: CGFloat = 80 // Default value, can be updated later
 
-    let maxBubbleSize: CGFloat = 130 // Add maxBubbleSize constant
-    let minBubbleSize: CGFloat = 20 // Add maxBubbleSize constant
+    let maxBubbleSize: CGFloat = 530 // Add maxBubbleSize constant
+    let minBubbleSize: CGFloat = 50 // Add maxBubbleSize constant
     var center: CGPoint = .zero
+    var bubbleCreationTimeInterval: TimeInterval = 0.15
+    private var lastBubbleCreationTime: TimeInterval = 0
+
 
     func setCenter(_ center: CGPoint) {
         self.center = center
@@ -34,10 +37,9 @@ class BubbleViewModel: ObservableObject {
             self.path = path
         }
 
-    func addBubble(at position: CGPoint) {
-        let size = CGFloat.random(in: minBubbleSize...maxBubbleSize) // Generate random size
-            let bubble = Bubble(position: position, size: size) // Add size here
-            bubbles.append(bubble)
+    func addBubble(at position: CGPoint, size: CGFloat) {
+        let bubble = Bubble(position: position, size: size)
+        bubbles.append(bubble)
         
         let angle = Double.random(in: 0..<2 * .pi)
         let distance: CGFloat = 100
@@ -55,7 +57,7 @@ class BubbleViewModel: ObservableObject {
 
     func applyGravity(to center: CGPoint) {
         let movementSpeed: CGFloat = 0.5
-        let buttonPushForce: CGFloat = 1.0
+        let buttonPushForce: CGFloat = 0.1
         let buttonRadius: CGFloat = buttonDiameter / 2
 
         for (index, bubble) in bubbles.enumerated() {
@@ -77,6 +79,16 @@ class BubbleViewModel: ObservableObject {
         }
         resolveCollisions()
     }
+    
+    func canCreateBubble() -> Bool {
+        let currentTime = CACurrentMediaTime()
+        if currentTime - lastBubbleCreationTime >= bubbleCreationTimeInterval {
+            lastBubbleCreationTime = currentTime
+            return true
+        }
+        return false
+    }
+
 
     func resolveCollisions() {
         let minPushForce: CGFloat = 0.7

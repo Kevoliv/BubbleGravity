@@ -15,7 +15,7 @@ struct BubbleView: View {
     var body: some View {
         Circle()
             .fill(Color.red)
-            .frame(width: size, height: size) // Use size property here
+            .frame(width: size, height: size) // Use bubble size here
             .position(position)
     }
 }
