@@ -17,6 +17,7 @@ struct BubbleView: View {
             .fill(Color.red)
             .frame(width: size, height: size) // Use bubble size here
             .position(position)
+            .zIndex(2) 
     }
 }
 

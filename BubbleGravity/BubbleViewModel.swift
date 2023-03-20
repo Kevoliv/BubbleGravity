@@ -17,11 +17,12 @@ struct Bubble: Identifiable {
 
 class BubbleViewModel: ObservableObject {
     @Published var bubbles: [Bubble] = []
-        
+    @Published var lastBubbleSize: CGFloat = 0
+
         var buttonDiameter: CGFloat = 80 // Default value, can be updated later
 
-    let maxBubbleSize: CGFloat = 530 // Add maxBubbleSize constant
-    let minBubbleSize: CGFloat = 50 // Add maxBubbleSize constant
+    let maxBubbleSize: CGFloat = 250 // Add maxBubbleSize constant
+    let minBubbleSize: CGFloat = 100 // Add maxBubbleSize constant
     var center: CGPoint = .zero
     var bubbleCreationTimeInterval: TimeInterval = 0.15
     private var lastBubbleCreationTime: TimeInterval = 0
@@ -37,28 +38,52 @@ class BubbleViewModel: ObservableObject {
             self.path = path
         }
 
-    func addBubble(at position: CGPoint, size: CGFloat) {
+    func addBubble(size: CGFloat) {
+        let position = center
         let bubble = Bubble(position: position, size: size)
         bubbles.append(bubble)
         
         let angle = Double.random(in: 0..<2 * .pi)
-        let distance: CGFloat = 100
+        let distance: CGFloat = 10
         let xOffset = cos(angle) * Double(distance)
         let yOffset = sin(angle) * Double(distance)
         let newPosition = CGPoint(x: position.x + CGFloat(xOffset), y: position.y + CGFloat(yOffset))
         
-        withAnimation(.easeOut(duration: 0.3)) {
+        withAnimation(.easeOut(duration: 0.0)) {
             bubbles[bubbles.count - 1].position = newPosition
+            lastBubbleSize = size
         }
         
-        animateBubbles(to: center)
+        animateBubbles(to: center, damping: 0.6, duration: 0.7)
+    }
+
+    func animateBubbles(to center: CGPoint, damping: CGFloat, duration: TimeInterval) {
+        withAnimation(.spring(response: duration, dampingFraction: damping)) {
+            for index in bubbles.indices {
+                let currentBubblePosition = bubbles[index].position
+                let distance = currentBubblePosition.distance(to: center)
+                let maxDistance = buttonDiameter / 2 + bubbles[index].size / 2
+                let factor = max(0, 1 - distance / maxDistance)
+                let newPosition = CGPoint(x: center.x + (currentBubblePosition.x - center.x) * factor,
+                                          y: center.y + (currentBubblePosition.y - center.y) * factor)
+                if !path.contains(newPosition) {
+                    bubbles[index].position = newPosition
+                }
+            }
+        }
     }
 
 
-    func applyGravity(to center: CGPoint) {
+
+
+
+
+
+    func applyGravity(to center: CGPoint, pushBackFactor: CGFloat = 0.1) {
         let movementSpeed: CGFloat = 0.5
-        let buttonPushForce: CGFloat = 0.1
+        let buttonPushForce: CGFloat = 0.3
         let buttonRadius: CGFloat = buttonDiameter / 2
+        let screenSize = UIScreen.main.bounds.size
 
         for (index, bubble) in bubbles.enumerated() {
             let currentPosition = bubble.position
@@ -69,7 +94,21 @@ class BubbleViewModel: ObservableObject {
 
             let newPosition = CGPoint(x: currentPosition.x + normalizedDirection.dx * movementSpeed, y: currentPosition.y + normalizedDirection.dy * movementSpeed)
 
-            bubbles[index].position = newPosition
+            var pushBackVector = CGVector(dx: 0, dy: 0)
+            if newPosition.x < bubbleRadius {
+                pushBackVector.dx = (bubbleRadius - newPosition.x) * pushBackFactor
+            } else if newPosition.x > screenSize.width - bubbleRadius {
+                pushBackVector.dx = -(newPosition.x - (screenSize.width - bubbleRadius)) * pushBackFactor
+            }
+
+            if newPosition.y < bubbleRadius {
+                pushBackVector.dy = (bubbleRadius - newPosition.y) * pushBackFactor
+            } else if newPosition.y > screenSize.height - bubbleRadius {
+                pushBackVector.dy = -(newPosition.y - (screenSize.height - bubbleRadius)) * pushBackFactor
+            }
+
+            bubbles[index].position = CGPoint(x: newPosition.x + pushBackVector.dx, y: newPosition.y + pushBackVector.dy)
+
 
             if distance < buttonRadius + bubbleRadius {
                 let pushDistance = max(0, buttonRadius + bubbleRadius - distance) * buttonPushForce
@@ -79,7 +118,7 @@ class BubbleViewModel: ObservableObject {
         }
         resolveCollisions()
     }
-    
+
     func canCreateBubble() -> Bool {
         let currentTime = CACurrentMediaTime()
         if currentTime - lastBubbleCreationTime >= bubbleCreationTimeInterval {
@@ -91,8 +130,8 @@ class BubbleViewModel: ObservableObject {
 
 
     func resolveCollisions() {
-        let minPushForce: CGFloat = 0.7
-        let maxPushForce: CGFloat = 2.0
+        let minPushForce: CGFloat = 0.2
+        let maxPushForce: CGFloat = 0.5
         let damping: CGFloat = 0.3
 
         for i in 0..<bubbles.count {
