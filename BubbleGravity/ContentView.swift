@@ -133,7 +133,7 @@ struct ContentView: View {
                 }, diameter: max(viewModel.buttonDiameter, plusButtonSize), bubbleSize: max(viewModel.minBubbleSize, plusButtonSize)) // Pass plusButtonSize
 // Pass dragState.width
                 .highPriorityGesture(
-                    DragGesture(minimumDistance: 0.1)
+                    DragGesture(minimumDistance: 0.0)
                         .onChanged { value in
                             let newSize = calculatePreviewBubbleSize(geometry: geometry, value)
                             previewBubbleSize = newSize
